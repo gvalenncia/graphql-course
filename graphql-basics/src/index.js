@@ -1,29 +1,31 @@
 import { GraphQLServer } from 'graphql-yoga'
+import { userInfo } from 'os';
+
+// Scalar types in graphql: String, Boolean, Int, float, ID
 
 // Type definitions (Schema)
 const typeDefs = `
     type Query {
-        hello: String!
+        me: User!
+    }
+
+    type User {
+        id: ID!
         name: String!
-        location: String!
-        bio: String!
+        email: String!
+        age: Int
     }
 `
 
 // Resolvers - functions that will be executed for every action or query happening in the api
 const  resolvers = {
     Query: {
-        hello() {
-            return 'hello, this is my first query!'
-        },
-        name() {
-            return 'German'
-        },
-        location(){
-            return 'Bogota'
-        },
-        bio(){
-            return 'Superman'
+        me(){
+            return {
+                id: '123456',
+                name: 'German',
+                email: 'gvalenncia@gmail.com'
+            }
         }
     }
 }
