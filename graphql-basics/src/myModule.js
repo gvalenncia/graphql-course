@@ -3,4 +3,8 @@ const name = 'German'
 
 const location = 'Bogota'
 
-export { message, name, location as default }
+const getGreeting = (name) => {
+    return 'welcome' + name
+}
+
+export { message, name, getGreeting, location as default }
