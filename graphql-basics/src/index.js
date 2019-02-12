@@ -7,6 +7,7 @@ import { userInfo } from 'os';
 const typeDefs = `
     type Query {
         me: User!
+        post: Post!
     }
 
     type User {
@@ -14,6 +15,12 @@ const typeDefs = `
         name: String!
         email: String!
         age: Int
+    }
+
+    type Post {
+        id: ID!
+        title: String!
+        body: String!
     }
 `
 
@@ -25,6 +32,13 @@ const  resolvers = {
                 id: '123456',
                 name: 'German',
                 email: 'gvalenncia@gmail.com'
+            }
+        },
+        post(){
+            return {
+                id: '888',
+                title: 'new post',
+                body: 'asdfasdf'
             }
         }
     }
