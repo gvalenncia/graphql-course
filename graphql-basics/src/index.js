@@ -3,12 +3,44 @@ import { userInfo } from 'os';
 
 // Scalar types in graphql: String, Boolean, Int, float, ID
 
+// Demo user data
+const users = [{
+    id: '1',
+    name: 'plinio',
+    email: 'plinio@gmail.com',
+    age: 35
+},{
+    id: '2',
+    name: 'Andrew',
+    email: 'andrew@example.com'
+},
+{
+    id: '3',
+    name: 'Sara',
+    email: 'sara@example.com'
+}]
+
+// Demo post data
+const posts = [{
+    id: '1',
+    title: 'My first post',
+    body: 'This is the body of my first post'
+},{
+    id: '2',
+    title: 'just another post',
+    body: 'This is the body of just another post'
+},
+{
+    id: '3',
+    title: 'have fun post',
+    body: 'do not forget to have fun while coding'
+}]
+
 // Type definitions (Schema)
 const typeDefs = `
     type Query {
-        add(numbers: [Float!]!): Float!
-        greeting(name: String): String!
-        grades: [Int!]!
+        users(query: String): [User!]!
+        posts(query: String): [Post!]!
         me: User!
         post: Post!
     }
@@ -30,23 +62,23 @@ const typeDefs = `
 // Resolvers - functions that will be executed for every action or query happening in the api
 const  resolvers = {
     Query: {
-        add(parent, args, ctx, info){
-            if (args.numbers.length === 0){
-                return 0
-            }
-            return args.numbers.reduce((accumulator, currentValue)=>{
-                return accumulator + currentValue
-            })
-        },
-        greeting( parent, args, ctx, info ){
-            if(args.name) {
-                return `Hello, ${args.name}`
+        users(parent, args, ctx, info){
+            if(args.query) {
+                return users.filter((user) => {
+                    return user.name.toLocaleLowerCase().includes(args.query.toLocaleLowerCase())
+                })
             } else {
-                return 'Hello everyone'
-            }
+                return users
+            }  
         },
-        grades(parent, args, ctx, info){
-            return [99,80,93]
+        posts(parent , args, ctx, info){
+            if(args.query){
+                return posts.filter((post) => {
+                    return post.title.toLocaleLowerCase().includes(args.query.toLocaleLowerCase()) || post.body.toLocaleLowerCase().includes(args.query.toLocaleLowerCase())
+                })
+            } else {
+                return posts
+            }
         },
         me(){
             return {
