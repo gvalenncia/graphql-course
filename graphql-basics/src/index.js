@@ -6,6 +6,8 @@ import { userInfo } from 'os';
 // Type definitions (Schema)
 const typeDefs = `
     type Query {
+        add(a: Float!, b: Float!): Float!
+        greeting(name: String): String!
         me: User!
         post: Post!
     }
@@ -27,6 +29,16 @@ const typeDefs = `
 // Resolvers - functions that will be executed for every action or query happening in the api
 const  resolvers = {
     Query: {
+        add(parent, args, ctx, info){
+            return args.a + args.b
+        },
+        greeting( parent, args, ctx, info ){
+            if(args.name) {
+                return `Hello, ${args.name}`
+            } else {
+                return 'Hello everyone'
+            }
+        },
         me(){
             return {
                 id: '123456',
