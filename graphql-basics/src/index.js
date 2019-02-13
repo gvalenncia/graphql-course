@@ -1,5 +1,6 @@
 import { GraphQLServer } from 'graphql-yoga'
 import uuidv4 from 'uuid/v4'
+import { Z_ASCII } from 'zlib';
 
 // Scalar types in graphql: String, Boolean, Int, float, ID
 
@@ -37,6 +38,8 @@ const typeDefs = `
 
     type Mutation {
         createUser(name: String!, email: String!, age: Int): User!
+        createPost(title: String!, body: String!, author: ID!): Post!
+        createComment(text: String!, post: ID!, author: ID!): Comment!
     }
 
     type User {
@@ -123,6 +126,42 @@ const  resolvers = {
                 users.push(user)
                 return user
             }
+        },
+        createPost(parent, args, ctx, info){
+            const userExists = users.some((user) => user.id === args.author)
+            
+            if(!userExists) {
+                throw new Error('User not found')
+            } else {
+                const post = {
+                    id: uuidv4(),
+                    title: args.title,
+                    body: args.body,
+                    author: args.author
+                }
+
+                posts.push(post)
+                return post
+            }
+        },
+        createComment(parent, args, ctx, info){
+            const userExists = users.some((user) => user.id === args.author)
+            const postExists = posts.some((post) => post.id === args.post)
+
+            if(!userExists || !postExists){
+                throw new Error('The author or the post do not exist')
+            } else {
+                const comment = {
+                    id: uuidv4(),
+                    text: args.text,
+                    author: args.author,
+                    post: args.post
+                }
+
+                comments.push(comment)
+                return comment
+            }
+
         }
     },
     Post: {
