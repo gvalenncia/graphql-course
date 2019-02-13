@@ -18,10 +18,10 @@ const posts = [
 
 // Comment mock data
 const comments = [
-    {id: '1', text: 'That is fucking awesome', author: '3'},
-    {id: '2', text: 'This is amazin mate', author: '3'},
-    {id: '3', text: 'just remember tis does not work', author: '3'},
-    {id: '4', text: 'make the one first thatn the other one', author: '3'}
+    {id: '1', text: 'That is fucking awesome', author: '3', post: '10'},
+    {id: '2', text: 'This is amazin mate', author: '3', post: '10'},
+    {id: '3', text: 'just remember tis does not work', author: '3', post: '30'},
+    {id: '4', text: 'make the one first thatn the other one', author: '3', post: '30'}
 ]
 
 // Type definitions (Schema)
@@ -48,12 +48,14 @@ const typeDefs = `
         title: String!
         body: String!
         author: User!
+        comments: [Comment!]!
     }
 
     type Comment {
         id: ID!
         text: String!
         author: User!
+        post: Post!
     }
 `
 
@@ -102,12 +104,22 @@ const  resolvers = {
             return users.find((user)=>{
                 return user.id === parent.author
             })
+        },
+        comments(parent, args, ctx, info){
+            return comments.filter((comment) => {
+                return comment.post === parent.id
+            })
         }
     },
     Comment: {
         author(parent, args, ctx, info){
             return users.find((user)=>{
                 return user.id === parent.author
+            })
+        },
+        post(parent, args, ctx,  info){
+            return posts.find((post)=>{
+                return post.id === parent.post
             })
         }
     },
