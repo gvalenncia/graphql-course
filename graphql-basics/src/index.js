@@ -16,9 +16,18 @@ const posts = [
     {id: '30', title: 'have fun', body: 'remember to have fun while coding', author: '2'}
 ]
 
+// Comment mock data
+const comments = [
+    {id: '1', text: 'That is fucking awesome'},
+    {id: '2', text: 'This is amazin mate'},
+    {id: '3', text: 'just remember tis does not work'},
+    {id: '4', text: 'make the one first thatn the other one'}
+]
+
 // Type definitions (Schema)
 const typeDefs = `
     type Query {
+        comments: [Comment!]!
         users(query: String): [User!]!
         posts(query: String): [Post!]!
         me: User!
@@ -38,11 +47,19 @@ const typeDefs = `
         body: String!
         author: User!
     }
+
+    type Comment {
+        id: ID!
+        text: String!
+    }
 `
 
 // Resolvers - functions that will be executed for every action or query happening in the api
 const  resolvers = {
     Query: {
+        comments() {
+            return comments
+        },
         users(parent, args, ctx, info){
             if(args.query){
                 return users.filter((user) => {
