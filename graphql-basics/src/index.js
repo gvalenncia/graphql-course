@@ -36,7 +36,7 @@ const typeDefs = `
         id: ID!
         title: String!
         body: String!
-        user: User!
+        author: User!
     }
 `
 
@@ -58,6 +58,8 @@ const  resolvers = {
                     return post.title.toLocaleLowerCase().includes(args.query.toLocaleLowerCase()) 
                     || post.body.toLocaleLowerCase().includes(args.query.toLocaleLowerCase())
                 })
+            } else {
+                return posts
             }
         },
         me(){
@@ -73,6 +75,13 @@ const  resolvers = {
                 title: 'new post',
                 body: 'asdfasdf'
             }
+        }
+    },
+    Post: {
+        author(parent, args, ctx, info){
+            return users.find((user)=>{
+                return user.id === parent.author
+            })
         }
     }
 }
