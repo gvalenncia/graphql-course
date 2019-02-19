@@ -9,9 +9,9 @@ const users = [
 
 // Post mock data
 const posts = [
-    {id: '10', title: 'My first post', body: 'this is my first post', author: '1'},
-    {id: '20', title: 'just another post', body: 'this is just another post body mate', author: '1'},
-    {id: '30', title: 'have fun', body: 'remember to have fun while coding', author: '2'}
+    {id: '10', title: 'My first post', body: 'this is my first post', published: 'true', author: '1'},
+    {id: '20', title: 'just another post', body: 'this is just another post body mate', published: 'true', author: '1'},
+    {id: '30', title: 'have fun', body: 'remember to have fun while coding', published: 'false', author: '2'}
 ]
 
 // Comment mock data
