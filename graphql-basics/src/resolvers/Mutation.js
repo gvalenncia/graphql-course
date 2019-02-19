@@ -178,37 +178,50 @@ const Mutation = {
             return comment
         }
     },
-    deleteComment(parent, args, ctx, info){
-        const commentIndex = ctx.db.comments.findIndex((comment)=> comment.id === args.id)
+    deleteComment(parent, args, { db, pubsub }, info){
+        const commentIndex = db.comments.findIndex((comment)=> comment.id === args.id)
 
         if(commentIndex === -1){
             throw new Error('Commnet not found')
         } else {
-            const deletedComments = ctx.db.comments.splice(commentIndex, 1)
+            const deletedComments = db.comments.splice(commentIndex, 1)
+            pubsub.publish(`comment ${deletedComments[0].post}`,{
+                comment: {
+                    mutation: 'DELETED',
+                    data: deletedComments[0]
+                }
+            })
             return deletedComments[0]
         }
     },
-    updateComment(parent, args, ctx, info){
+    updateComment(parent, args, { db, pubsub }, info){
         const { id, data } = args
-        const comment = ctx.db.comments.find((comment) => comment.id === id)
+        const uComment = db.comments.find((comment) => comment.id === id)
 
-        if(!comment){
+        if(!uComment){
             throw new Error('Comment not found')
         } 
 
         if(typeof data.text === 'string') {
-            comment.text = data.text
+            uComment.text = data.text
         }
 
         if(typeof data.post === 'undefined'){
-            comment.post = data.post
+            uComment.post = data.post
         }
 
         if(typeof data.author !== 'undefined'){
-            comment.author = comment.author
+            uComment.author = data.author
         }
 
-        return comment
+        pubsub.publish(`comment ${uComment.post}`, {
+            comment: {
+                mutation: 'UPDATED',
+                data: uComment
+            }
+        })
+
+        return uComment
     }
 }
 
