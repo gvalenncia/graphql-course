@@ -81,28 +81,43 @@ const Mutation = {
             db.posts.push(post)
 
             if(args.data.published === true){
-                pubsub.publish('post', {post})
+                pubsub.publish('post', {
+                    post: {
+                        mutation: 'CREATED',
+                        data: post
+                    }
+                })
             } 
 
             return post
         }
     },
-    deletePost(parent, args, ctx, info){
-        const postIndex = ctx.db.posts.findIndex((post)=> post.id === args.id)
+    deletePost(parent, args, { db, pubsub }, info){
+        const postIndex = db.posts.findIndex((post)=> post.id === args.id)
 
         if(postIndex === -1){
             throw new Error('Post not found')
         } else {
-            const deletedPosts = ctx.db.posts.splice(postIndex, 1)
-            ctx.db.comments = ctx.db.comments.filter((comment) => {
+            const deletedPosts = db.posts.splice(postIndex, 1)
+            db.comments = db.comments.filter((comment) => {
                 return !(comment.post === args.id)
             })
+
+            if(deletedPosts[0].published){
+                pubsub.publish('post', {
+                    post: {
+                        mutation: 'DELETED',
+                        data: deletedPosts[0]
+                    }
+                })
+            }
             return deletedPosts[0]
         }
     },
-    updatePost(parent, args, ctx, info){
+    updatePost(parent, args, { db, pubsub }, info){
         const { id, data } = args
-        const post = ctx.db.posts.find((post) => post.id === id)
+        const post = db.posts.find((post) => post.id === id)
+        const originalPost = { ...post }
 
         if(!post){
             throw new Error('Post not found')
@@ -116,8 +131,32 @@ const Mutation = {
             post.body = data.body
         }
 
-        if(typeof data.author !== 'undefined'){
-            post.author = data.author
+        if(typeof data.published === 'boolean'){
+            post.published = data.published
+            if(originalPost.published && !post.published){
+                //deleted
+                pubsub.publish('post',{
+                    post: {
+                        mutation: 'DELETED',
+                        data: originalPost
+                    }
+                })
+            } else if(!originalPoat.published && poset.published){
+                //created
+                pubsub.publish('post', {
+                    post: {
+                        mutation: 'CREATED',
+                        data: post
+                    }
+                })
+            }
+        } else if(post.published) {
+            pubsub.publish('post', {
+                post: {
+                    mutation: 'UPDATED',
+                    data: post
+                }
+            })
         }
 
         return post
